@@ -1,7 +1,6 @@
 const Client = require("mssql-async").default;
 const dotenv = require("dotenv");
 const fs = require("fs");
-
 const { processDataAsync } = require("./processData");
 
 dotenv.config();
@@ -21,15 +20,24 @@ dotenv.config();
 //     Order = 4
 // }
 
+const createDateTime = () =>
+  new Date().toISOString().slice(0, 10).replace(/-/g, "");
+
 const scriptConfig = {
   delivery: {
-    dataFilePath: `./data/${new Date()
-      .toISOString()
-      .slice(0, 10)
-      .replace(/-/g, "")}-deliveries.json`,
+    dataFilePath: `./data/${createDateTime()}-deliveries.json`,
     retrieveSQLQuery:
       "SELECT id, Comments, BuyerId, PartnershipId, CreatedBy from deliveries where Comments like '%<img src=%' and deleted = 0",
-    databaseTableName: "deliveries",
+    databaseTableName: "Deliveries",
+    fileClassificationId: 999,
+    artefactTypeId: 2,
+    dataColumnName: "Comments",
+  },
+  contract: {
+    dataFilePath: `./data/${createDateTime()}-contract.json`,
+    retrieveSQLQuery:
+      "SELECT id, Comments, BuyerId, PartnershipId, CreatedBy from Contracts where Comments like '%<img src=%' and deleted = 0",
+    databaseTableName: "Contracts",
     fileClassificationId: 999,
     artefactTypeId: 2,
     dataColumnName: "Comments",

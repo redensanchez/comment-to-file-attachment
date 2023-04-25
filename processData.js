@@ -24,6 +24,7 @@ module.exports = {
       );
 
       // Create a trasaction that will wrap around all the processing tasks so when 1 task fails the db change will be reverted
+      // This does not revert the upload file process
       await apiClient.transaction(async (db) => {
         console.log("[SCRIPT-LOG] - Upload image as attachment");
         // Upload image as file attachment to the artefact
@@ -37,6 +38,7 @@ module.exports = {
         await db.update(
           "UPDATE Deliveries SET Comments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
           {
+            // @TODO - Consult @Timm for the default comment replacement
             Comment: innerText.concat(
               "<br /><p>The images have been moved to file attachment</p>"
             ),
