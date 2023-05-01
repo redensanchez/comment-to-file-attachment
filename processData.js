@@ -106,7 +106,6 @@ module.exports = {
 
       // To select org, first filter the response to remove the failing organisation
       // Then select the first item
-      console.log(dummyUplodResponses, nonNullResponses);
       const selectedOperationOrg = nonNullResponses[0][0];
 
       // Delete dummy uploads

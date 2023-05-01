@@ -60,6 +60,34 @@ const scriptConfig = {
     artefactTypeId: 1,
     dataColumnName: "CommentsSpecialTerms",
   },
+  orderOrigin: {
+    dataFilePath: `./data/${createDateTime()}-orderOrigin.json`,
+    retrieveSQLQuery:
+      "SELECT id, OriginComments FROM Orders where OriginComments like '%<img src=%' and deleted = 0",
+    retrieveOrgSQLQuery: `SELECT o.BuyerId, o.CreatorOrgId, c.PurchaserId, c.SellerId, c.PartnershipId, c.CreatorOrganisationId FROM Orders o
+      LEFT JOIN Contracts c ON c.id = o.OriginContractId OR c.id = DestinationContractId 
+      WHERE c.id = @artefactId`,
+    updateTableSQLQuery:
+      "UPDATE Orders SET OriginComments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
+    databaseTableName: "Orders",
+    fileClassificationId: 999,
+    artefactTypeId: 4,
+    dataColumnName: "OriginComments",
+  },
+  orderDestination: {
+    dataFilePath: `./data/${createDateTime()}-orderDestination.json`,
+    retrieveSQLQuery:
+      "SELECT id, DestinationComments FROM Orders where DestinationComments like '%<img src=%' and deleted = 0",
+    retrieveOrgSQLQuery: `SELECT o.BuyerId, o.CreatorOrgId, c.PurchaserId, c.SellerId, c.PartnershipId, c.CreatorOrganisationId FROM Orders o
+      LEFT JOIN Contracts c ON c.id = o.OriginContractId OR c.id = DestinationContractId 
+      WHERE c.id = @artefactId`,
+    updateTableSQLQuery:
+      "UPDATE Orders SET DestinationComments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
+    databaseTableName: "Orders",
+    fileClassificationId: 999,
+    artefactTypeId: 4,
+    dataColumnName: "DestinationComments",
+  },
 };
 
 const startJobAsync = async () => {
