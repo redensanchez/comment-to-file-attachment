@@ -28,6 +28,16 @@ const scriptConfig = {
     dataFilePath: `./data/${createDateTime()}-deliveries.json`,
     retrieveSQLQuery:
       "SELECT id, Comments, BuyerId, PartnershipId, CreatedBy from deliveries where Comments like '%<img src=%' and deleted = 0",
+    retrieveOrgSQLQuery: `SELECT 
+      d.BuyerId as deliveryBuyerId, d.PartnershipId as deliveryPartnershipId,
+      l.SiteOperatorId as locationSiteOperatorId, l.PartnershipId as locationPartnershipId,
+      c.PurchaserId as contractPurchaserId, c.PartnershipId as contractPartnershipId, c.SellerId as contractSellerId, c.CreatorOrganisationId as contractCreatorId,
+      o.BuyerId as orderBuyerId, o.CreatorOrgId as orderCreatorId
+    FROM Deliveries d 
+    LEFT JOIN Locations l on l.id = d.LocationId
+    LEFT JOIN Contracts c on c.id = d.ContractId 
+    LEFT JOIN Orders o on o.id = d.OrderId 
+    WHERE d.id = @delId`,
     databaseTableName: "Deliveries",
     fileClassificationId: 999,
     artefactTypeId: 2,
@@ -54,19 +64,11 @@ const startJobAsync = async () => {
     database: process.env.DB_DATABASE_API,
   });
 
-  const ousClient = new Client({
-    server: process.env.DB_SERVER,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE_OUS,
-  });
-
   const config = scriptConfig["delivery"];
 
   // Test connection
   console.log("[SCRIPT-LOG] - Test connection to the database");
   await apiClient.getall(`SELECT TOP 1 * FROM ${config.databaseTableName}`);
-  await ousClient.getall(`SELECT TOP 1 * FROM organisations`);
 
   // Check if a previous job has not completed
   console.log("[SCRIPT-LOG] - Checking for existing data");
@@ -75,7 +77,7 @@ const startJobAsync = async () => {
   if (exists) {
     console.log("[SCRIPT-LOG] - Data exists, proceed to processing");
     const data = fs.readFileSync(config.dataFilePath);
-    return processDataAsync(JSON.parse(data), apiClient, config, ousClient);
+    return processDataAsync(JSON.parse(data), apiClient, config);
   }
 
   // Fetch data for processisng
@@ -90,7 +92,7 @@ const startJobAsync = async () => {
   console.log(`[SCRIPT-LOG] - Saving ${success ? "succeeded" : "failed"}`);
 
   console.log("[SCRIPT-LOG] - Proceed to processing");
-  return processDataAsync(data, apiClient, config, ousClient);
+  return processDataAsync(data, apiClient, config);
 };
 
 console.time("[SCRIPT-LOG] - Job completed");

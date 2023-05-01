@@ -1,14 +1,7 @@
-const axios = require("axios");
 const { fromBuffer } = require("file-type");
 const { uniqueId } = require("lodash");
 const fs = require("fs");
-
-const api = () =>
-  axios.create({
-    headers: {
-      Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-    },
-  });
+const { api, postUrl } = require("./helper");
 
 module.exports = {
   uploadFileAttachment: async (imageSrcUri, orgId, dataId, config) => {
@@ -41,18 +34,17 @@ module.exports = {
       file: fileStream,
     };
 
-    const url = `https://dev-api.agridigital.io/api/v1/attachments/${orgId}/file/upload`;
-
     console.log("[SCRIPT-LOG] - Uploading", { dataId, orgId });
 
     return api()
-      .post(url, payload, {
+      .post(postUrl(orgId), payload, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then(({ data }) => {
         // Remove file
         fileStream.close();
         console.log(`[SCRIPT-LOG] - Upload completed! FileId - ${data.fileId}`);
+        return data.fileId;
       })
       .catch((err) => {
         console.log(
