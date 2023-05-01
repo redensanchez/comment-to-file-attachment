@@ -39,7 +39,7 @@ module.exports = {
         orderBuyerId,
         orderCreatorId,
       } = await apiClient.getrow(config.retrieveOrgSQLQuery, {
-        delId: data.id,
+        artefactId: data.id,
       });
 
       const uniqOrgs = [
@@ -77,7 +77,10 @@ module.exports = {
             headers: { "Content-Type": "multipart/form-data" },
           })
           .then(({ data }) => data.fileId)
-          .catch(() => null);
+          .catch((err) => {
+            console.error(err.response.data);
+            return null;
+          });
       };
 
       console.log(
@@ -88,10 +91,11 @@ module.exports = {
 
       // Upload dummy file attachment using the list of orgs extracted on the artefact
       // This method will determine what org we will be using for the actual file attachment
-      const dummyUplodResponses = await uniqOrgs.reduce(async (res, org) => {
-        const result = await uploadDummyDataAndGetCorrectOrg(org);
+      const dummyUplodResponses = await uniqOrgs.reduce(async (res, orgId) => {
+        console.log("[SCRIPT-LOG] - Uploading dummy using org: ", orgId);
+        const result = await uploadDummyDataAndGetCorrectOrg(orgId);
         const v = await res;
-        v[org] = result;
+        v[orgId] = result;
         return v;
       }, {});
 
@@ -102,6 +106,7 @@ module.exports = {
 
       // To select org, first filter the response to remove the failing organisation
       // Then select the first item
+      console.log(dummyUplodResponses, nonNullResponses);
       const selectedOperationOrg = nonNullResponses[0][0];
 
       // Delete dummy uploads
@@ -135,17 +140,14 @@ module.exports = {
 
           console.log("[SCRIPT-JOB] - Remove image from DB");
           // Remove image from comment
-          await db.update(
-            "UPDATE Deliveries SET Comments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
-            {
-              // @TODO - Consult @Timm for the default comment replacement
-              Comment: cleanHtml.concat(
-                "<br /><p>The images have been moved to file attachment</p>"
-              ),
-              UpdatedBy: "IT-1939",
-              id: data.id,
-            }
-          );
+          await db.update(config.updateTableSQLQuery, {
+            // @TODO - Consult @Timm for the default comment replacement
+            Comment: cleanHtml.concat(
+              "<br /><p>The images have been moved to file attachment</p>"
+            ),
+            UpdatedBy: "IT-1939",
+            id: data.id,
+          });
 
           console.log("[SCRIPT-LOG] - Remove data from file");
           // Remove the data from the file on and save

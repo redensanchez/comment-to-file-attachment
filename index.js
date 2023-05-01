@@ -27,7 +27,7 @@ const scriptConfig = {
   delivery: {
     dataFilePath: `./data/${createDateTime()}-deliveries.json`,
     retrieveSQLQuery:
-      "SELECT id, Comments, BuyerId, PartnershipId, CreatedBy from deliveries where Comments like '%<img src=%' and deleted = 0",
+      "SELECT id, Comments from deliveries where Comments like '%<img src=%' and deleted = 0",
     retrieveOrgSQLQuery: `SELECT 
       d.BuyerId as deliveryBuyerId, d.PartnershipId as deliveryPartnershipId,
       l.SiteOperatorId as locationSiteOperatorId, l.PartnershipId as locationPartnershipId,
@@ -37,7 +37,9 @@ const scriptConfig = {
     LEFT JOIN Locations l on l.id = d.LocationId
     LEFT JOIN Contracts c on c.id = d.ContractId 
     LEFT JOIN Orders o on o.id = d.OrderId 
-    WHERE d.id = @delId`,
+    WHERE d.id = @artefactId`,
+    updateTableSQLQuery:
+      "UPDATE Deliveries SET Comments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
     databaseTableName: "Deliveries",
     fileClassificationId: 999,
     artefactTypeId: 2,
@@ -46,11 +48,17 @@ const scriptConfig = {
   contract: {
     dataFilePath: `./data/${createDateTime()}-contract.json`,
     retrieveSQLQuery:
-      "SELECT id, Comments, BuyerId, PartnershipId, CreatedBy from Contracts where Comments like '%<img src=%' and deleted = 0",
+      "SELECT id, CommentsSpecialTerms from Contracts where CommentsSpecialTerms like '%<img src=%' and deleted = 0",
+    retrieveOrgSQLQuery: `SELECT
+        c.PurchaserId as contractPurchaserId, c.PartnershipId as contractPartnershipId, c.SellerId as contractSellerId, c.CreatorOrganisationId as contractCreatorId
+      FROM Contracts c
+      WHERE c.id = @artefactId`,
+    updateTableSQLQuery:
+      "UPDATE Contracts SET CommentsSpecialTerms=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
     databaseTableName: "Contracts",
     fileClassificationId: 999,
-    artefactTypeId: 2,
-    dataColumnName: "Comments",
+    artefactTypeId: 1,
+    dataColumnName: "CommentsSpecialTerms",
   },
 };
 
@@ -64,7 +72,13 @@ const startJobAsync = async () => {
     database: process.env.DB_DATABASE_API,
   });
 
-  const config = scriptConfig["delivery"];
+  console.log(
+    `[SCRIPT-LOG] - Running script for artefact ${
+      process.argv[2] || "delivery"
+    }`
+  );
+
+  const config = scriptConfig[process.argv[2] || "delivery"];
 
   // Test connection
   console.log("[SCRIPT-LOG] - Test connection to the database");
