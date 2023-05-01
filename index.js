@@ -64,9 +64,34 @@ const scriptConfig = {
     dataFilePath: `./data/${createDateTime()}-orderOrigin.json`,
     retrieveSQLQuery:
       "SELECT id, OriginComments FROM Orders where OriginComments like '%<img src=%' and deleted = 0",
-    retrieveOrgSQLQuery: `SELECT o.BuyerId, o.CreatorOrgId, c.PurchaserId, c.SellerId, c.PartnershipId, c.CreatorOrganisationId FROM Orders o
-      LEFT JOIN Contracts c ON c.id = o.OriginContractId OR c.id = DestinationContractId 
-      WHERE c.id = @artefactId`,
+    retrieveOrgSQLQuery: `SELECT o.BuyerId as orderBuyerId,
+        o.CreatorOrgId as orderCreatorId,
+        c.PurchaserId as contractPurchaserId,
+        c.SellerId as contractSellerId,
+        c.PartnershipId as contractPartnershipId,
+        c.CreatorOrganisationId as contractCreatorId,
+        c2.PurchaserId as contractPurchaserId2,
+        c2.SellerId as contractSellerId2,
+        c2.PartnershipId as contractPartnertshipId2,
+        c2.CreatorOrganisationId as contractCreatorId2,
+        l.SiteOperatorId as locationSiteOperatorId,
+        l.PartnershipId as locationPartnershipId,
+        l2.SiteOperatorId as locationSiteOperatorId2,
+        l2.PartnershipId as locationPartnershipId2,
+        l3.SiteOperatorId as locationSiteOperatorId3,
+        l3.PartnershipId as locationPartnershipId3,
+        l4.SiteOperatorId as locationSiteOperatorId4,
+        l4.PartnershipId as locationPartnershipId4
+      FROM Orders o
+        LEFT JOIN Contracts c ON c.id = o.OriginContractId
+        LEFT JOIN Contracts c2 ON c2.id = DestinationContractId
+        LEFT JOIN Locations l on l.id = o.OriginLocationId
+        LEFT JOIN Locations l2 on l2.id = o.DestinationLocationId
+        LEFT JOIN BinSegregations bs on bs.id = OriginBinSegregationId
+        LEFT JOIN BinSegregations bs2 on bs2.id = DestinationBinSegregationId
+        LEFT JOIN Locations l3 on l3.id = bs.SiteId
+        LEFT JOIN Locations l4 on l4.id = bs2.SiteId
+      WHERE o.id = @artefactId`,
     updateTableSQLQuery:
       "UPDATE Orders SET OriginComments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
     databaseTableName: "Orders",
@@ -78,9 +103,34 @@ const scriptConfig = {
     dataFilePath: `./data/${createDateTime()}-orderDestination.json`,
     retrieveSQLQuery:
       "SELECT id, DestinationComments FROM Orders where DestinationComments like '%<img src=%' and deleted = 0",
-    retrieveOrgSQLQuery: `SELECT o.BuyerId, o.CreatorOrgId, c.PurchaserId, c.SellerId, c.PartnershipId, c.CreatorOrganisationId FROM Orders o
-      LEFT JOIN Contracts c ON c.id = o.OriginContractId OR c.id = DestinationContractId 
-      WHERE c.id = @artefactId`,
+    retrieveOrgSQLQuery: `SELECT o.BuyerId as orderBuyerId,
+        o.CreatorOrgId as orderCreatorId,
+        c.PurchaserId as contractPurchaserId,
+        c.SellerId as contractSellerId,
+        c.PartnershipId as contractPartnershipId,
+        c.CreatorOrganisationId as contractCreatorId,
+        c2.PurchaserId as contractPurchaserId2,
+        c2.SellerId as contractSellerId2,
+        c2.PartnershipId as contractPartnertshipId2,
+        c2.CreatorOrganisationId as contractCreatorId2,
+        l.SiteOperatorId as locationSiteOperatorId,
+        l.PartnershipId as locationPartnershipId,
+        l2.SiteOperatorId as locationSiteOperatorId2,
+        l2.PartnershipId as locationPartnershipId2,
+        l3.SiteOperatorId as locationSiteOperatorId3,
+        l3.PartnershipId as locationPartnershipId3,
+        l4.SiteOperatorId as locationSiteOperatorId4,
+        l4.PartnershipId as locationPartnershipId4
+      FROM Orders o
+        LEFT JOIN Contracts c ON c.id = o.OriginContractId
+        LEFT JOIN Contracts c2 ON c2.id = DestinationContractId
+        LEFT JOIN Locations l on l.id = o.OriginLocationId
+        LEFT JOIN Locations l2 on l2.id = o.DestinationLocationId
+        LEFT JOIN BinSegregations bs on bs.id = OriginBinSegregationId
+        LEFT JOIN BinSegregations bs2 on bs2.id = DestinationBinSegregationId
+        LEFT JOIN Locations l3 on l3.id = bs.SiteId
+        LEFT JOIN Locations l4 on l4.id = bs2.SiteId
+      WHERE o.id = @artefactId`,
     updateTableSQLQuery:
       "UPDATE Orders SET DestinationComments=@Comment, UpdatedBy=@UpdatedBy WHERE id = @id",
     databaseTableName: "Orders",

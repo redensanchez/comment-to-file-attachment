@@ -38,6 +38,16 @@ module.exports = {
         contractCreatorId,
         orderBuyerId,
         orderCreatorId,
+        contractBuyerId2,
+        contractSellerId2,
+        contractPartnershipId2,
+        contractCreatorId2,
+        locationSiteOperatorId2,
+        locationPartnershipId2,
+        locationSiteOperatorId3,
+        locationPartnershipId3,
+        locationSiteOperatorId4,
+        locationPartnershipId4,
       } = await apiClient.getrow(config.retrieveOrgSQLQuery, {
         artefactId: data.id,
       });
@@ -54,6 +64,16 @@ module.exports = {
           contractCreatorId,
           orderBuyerId,
           orderCreatorId,
+          contractBuyerId2,
+          contractSellerId2,
+          contractPartnershipId2,
+          contractCreatorId2,
+          locationSiteOperatorId2,
+          locationPartnershipId2,
+          locationSiteOperatorId3,
+          locationPartnershipId3,
+          locationSiteOperatorId4,
+          locationPartnershipId4,
         ]),
       ].filter(Boolean);
 
@@ -78,7 +98,7 @@ module.exports = {
           })
           .then(({ data }) => data.fileId)
           .catch((err) => {
-            console.error(err.response.data);
+            // console.error(err.response.data);
             return null;
           });
       };
