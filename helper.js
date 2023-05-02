@@ -4,13 +4,17 @@ const api = () =>
   axios.create({
     headers: {
       Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+      "Agridigital-API-PrivateKey": process.env.API_HEADER_KEY,
     },
   });
 
 const postUrl = (orgId) =>
-  `https://dev-api.agridigital.io/api/v1/attachments/${orgId}/file/upload`;
+  `https://${process.env.API_DOMAIN}/api/v1/attachments/${orgId}/file/upload`;
 
 const deleteUrl = (orgId, fileId) =>
-  `https://dev-api.agridigital.io/api/v1/attachments/${orgId}/file/${fileId}`;
+  `https://${process.env.API_DOMAIN}/api/v1/attachments/${orgId}/file/${fileId}`;
 
-module.exports = { api, postUrl, deleteUrl };
+const updateElasticUrl = (artefactIds, featureType) =>
+  `https://${process.env.API_DOMAIN}/api/v1/admin/search-update?entityId=${artefactIds.join(',')}&featureType=${featureType}&action=Update`;
+
+module.exports = { api, postUrl, deleteUrl, updateElasticUrl };

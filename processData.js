@@ -2,7 +2,7 @@ const { uploadFileAttachment } = require("./upload");
 const { parse } = require("node-html-parser");
 const { cloneDeep } = require("lodash");
 const fs = require("fs");
-const { api, postUrl, deleteUrl } = require("./helper");
+const { api, postUrl, deleteUrl, updateElasticUrl } = require("./helper");
 
 // Process images and post
 module.exports = {
@@ -187,5 +187,12 @@ module.exports = {
           }
         });
     }
+
+    // Update elastic
+    await api()
+      .post(updateElasticUrl(dataArr.map(d => d.id), config.elasticFeatureType))
+      .catch((err) =>
+        console.log("[SCRIPT-LOG] - Failed to update elastic records", err)
+      );
   },
 };

@@ -44,6 +44,7 @@ const scriptConfig = {
     fileClassificationId: 999,
     artefactTypeId: 2,
     dataColumnName: "Comments",
+    elasticFeatureType: "Delivery",
   },
   contract: {
     dataFilePath: `./data/${createDateTime()}-contract.json`,
@@ -59,6 +60,7 @@ const scriptConfig = {
     fileClassificationId: 999,
     artefactTypeId: 1,
     dataColumnName: "CommentsSpecialTerms",
+    elasticFeatureType: "Contract",
   },
   orderOrigin: {
     dataFilePath: `./data/${createDateTime()}-orderOrigin.json`,
@@ -98,6 +100,7 @@ const scriptConfig = {
     fileClassificationId: 999,
     artefactTypeId: 4,
     dataColumnName: "OriginComments",
+    elasticFeatureType: "Order",
   },
   orderDestination: {
     dataFilePath: `./data/${createDateTime()}-orderDestination.json`,
@@ -137,6 +140,7 @@ const scriptConfig = {
     fileClassificationId: 999,
     artefactTypeId: 4,
     dataColumnName: "DestinationComments",
+    elasticFeatureType: "Order",
   },
 };
 
